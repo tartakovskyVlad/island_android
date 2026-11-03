@@ -106,7 +106,7 @@ textarea{width:100%;font:12px/1.3 monospace;direction:ltr;background:var(--bg);c
 <dialog id="dlg">
   <h3 id="t-set" style="margin-top:0"></h3>
   <div style="margin:10px 0"><div id="t-player" style="font-weight:500;margin-bottom:6px"></div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="chip" id="cur-name"></span><button class="chip" id="b-ex" type="button"></button><button class="chip" id="b-new" type="button"></button></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><button class="chip" id="cur-name" type="button"></button><button class="chip" id="b-ex" type="button"></button><button class="chip" id="b-new" type="button"></button></div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="chip" id="b-exp" type="button"></button><button class="chip" id="b-imp" type="button"></button><input type="file" id="imp" accept="application/json,.json" hidden></div>
     <div class="hint" id="umsg" aria-live="polite"></div></div>
   <label><span id="t-scene"></span><select id="scene-sel" class="chip" style="width:auto"></select></label>
@@ -133,11 +133,18 @@ textarea{width:100%;font:12px/1.3 monospace;direction:ltr;background:var(--bg);c
   <div class="go"><button class="btn" id="save"></button></div>
 </dialog>
 
+<dialog id="statdlg">
+  <div id="stav" style="font-size:56px;text-align:center"></div>
+  <h3 id="stname" style="text-align:center;margin:4px 0 12px"></h3>
+  <table id="sttab" style="width:100%;border-collapse:collapse"></table>
+  <div class="go"><button class="btn" id="stclose" type="button"></button></div>
+</dialog>
+
 <script>
 const T={
-ru:{name:"Русский",ask:"Кто играет?",usr_ex:"Существующий пользователь",usr_new:"Новый пользователь",taken:"Такое имя уже есть. Выберите «Существующий пользователь».",best:"Рекорд",games:"Игр",load:"Продолжить",create:"Создать",exp:"Экспорт",imp:"Импорт",player:"Игрок",bad2:"Неверный файл",scene:"Сцена",sadv:["Ой, не допрыгнул… Бум!","Упс, ты упал…","Неправильно. Попробуй ещё раз!"],start:"Начать",pname:"Имя",avatar:"Аватар",upload:"📷 Своё фото",addlang:"Добавить язык",lname:"Название языка",rtl:false,add:"Добавить",hint:"Переведите только значения, ключи не меняйте. Можно попросить ИИ перевести.",bad:"Ошибка в тексте перевода",title:"Прыжок на остров",score:"Очки",min:"Наименьшее число",max:"Наибольшее число",ops:"Действия",wr:"Ошибок до конца игры",set:"Настройки",save:"Играть",jump:"Прыгнуть!",over:"Игра окончена",again:"Играть снова",good:["Ура! Молодец!","Верно! Отлично!","Правильно! Так держать!"],sad:["Ой, не получилось… Булль!","Упс, ты упал в воду…","Неправильно. Попробуй ещё раз!"]},
-he:{name:"עברית",rtl:true,ask:"מי משחק?",usr_ex:"משתמש קיים",usr_new:"משתמש חדש",taken:"השם כבר קיים. בחרו משתמש קיים.",best:"שיא",games:"משחקים",load:"המשך",create:"צור",exp:"ייצוא",imp:"ייבוא",player:"שחקן",bad2:"קובץ לא תקין",scene:"תפאורה",sadv:["אוי, לא הגעת… בום!","אופס, נפלת…","לא נכון. נסו שוב!"],start:"התחל",pname:"שם",avatar:"דמות",upload:"📷 תמונה משלי",addlang:"הוספת שפה",lname:"שם השפה",add:"הוסף",hint:"תרגמו רק את הערכים, לא את המפתחות. אפשר לבקש מבינה מלאכותית לתרגם.",bad:"שגיאה בטקסט התרגום",title:"קפיצה לאי",score:"נקודות",min:"המספר הקטן ביותר",max:"המספר הגדול ביותר",ops:"פעולות",wr:"טעויות עד סוף המשחק",set:"הגדרות",save:"שחקו",jump:"קפוץ!",over:"המשחק נגמר",again:"שחקו שוב",good:["יששש! כל הכבוד!","נכון! מעולה!","תשובה נכונה! המשך כך!"],sad:["אוי, לא הצליח… בלוב!","אופס, נפלת למים…","לא נכון. נסו שוב!"]},
-en:{name:"English",rtl:false,ask:"Who is playing?",usr_ex:"Existing user",usr_new:"New user",taken:"This name already exists. Choose Existing user.",best:"Best",games:"Games",load:"Continue",create:"Create",exp:"Export",imp:"Import",player:"Player",bad2:"Invalid file",scene:"Scene",sadv:["Oh no… thud!","Oops, you fell down…","Not right. Try again!"],start:"Start",pname:"Name",avatar:"Avatar",upload:"📷 Your own photo",addlang:"Add a language",lname:"Language name",add:"Add",hint:"Translate the values only, keep the keys. You can ask an AI to translate.",bad:"The translation text is not valid",title:"Island Hop",score:"Score",min:"Smallest number",max:"Largest number",ops:"Operations",wr:"Mistakes until game over",set:"Settings",save:"Play",jump:"Jump!",over:"Game over",again:"Play again",good:["Hooray! Well done!","Correct! Great!","Right! Keep going!"],sad:["Oh no… splash!","Oops, you fell in the water…","Not right. Try again!"]}
+ru:{name:"Русский",ask:"Кто играет?",usr_ex:"Существующий пользователь",usr_new:"Новый пользователь",taken:"Такое имя уже есть. Выберите «Существующий пользователь».",best:"Рекорд",games:"Игр",load:"Продолжить",create:"Создать",exp:"Экспорт",imp:"Импорт",player:"Игрок",stg:"Сыграно игр",stp:"Всего очков",stl:"Последняя игра",stt:"Рекорд",sts:"решено",close:"Закрыть",bad2:"Неверный файл",scene:"Сцена",sadv:["Ой, не допрыгнул… Бум!","Упс, ты упал…","Неправильно. Попробуй ещё раз!"],start:"Начать",pname:"Имя",avatar:"Аватар",upload:"📷 Своё фото",addlang:"Добавить язык",lname:"Название языка",rtl:false,add:"Добавить",hint:"Переведите только значения, ключи не меняйте. Можно попросить ИИ перевести.",bad:"Ошибка в тексте перевода",title:"Прыжок на остров",score:"Очки",min:"Наименьшее число",max:"Наибольшее число",ops:"Действия",wr:"Ошибок до конца игры",set:"Настройки",save:"Играть",jump:"Прыгнуть!",over:"Игра окончена",again:"Играть снова",good:["Ура! Молодец!","Верно! Отлично!","Правильно! Так держать!"],sad:["Ой, не получилось… Булль!","Упс, ты упал в воду…","Неправильно. Попробуй ещё раз!"]},
+he:{name:"עברית",rtl:true,ask:"מי משחק?",usr_ex:"משתמש קיים",usr_new:"משתמש חדש",taken:"השם כבר קיים. בחרו משתמש קיים.",best:"שיא",games:"משחקים",load:"המשך",create:"צור",exp:"ייצוא",imp:"ייבוא",player:"שחקן",stg:"משחקים ששוחקו",stp:"סך הנקודות",stl:"משחק אחרון",stt:"שיא",sts:"נפתרו",close:"סגור",bad2:"קובץ לא תקין",scene:"תפאורה",sadv:["אוי, לא הגעת… בום!","אופס, נפלת…","לא נכון. נסו שוב!"],start:"התחל",pname:"שם",avatar:"דמות",upload:"📷 תמונה משלי",addlang:"הוספת שפה",lname:"שם השפה",add:"הוסף",hint:"תרגמו רק את הערכים, לא את המפתחות. אפשר לבקש מבינה מלאכותית לתרגם.",bad:"שגיאה בטקסט התרגום",title:"קפיצה לאי",score:"נקודות",min:"המספר הקטן ביותר",max:"המספר הגדול ביותר",ops:"פעולות",wr:"טעויות עד סוף המשחק",set:"הגדרות",save:"שחקו",jump:"קפוץ!",over:"המשחק נגמר",again:"שחקו שוב",good:["יששש! כל הכבוד!","נכון! מעולה!","תשובה נכונה! המשך כך!"],sad:["אוי, לא הצליח… בלוב!","אופס, נפלת למים…","לא נכון. נסו שוב!"]},
+en:{name:"English",rtl:false,ask:"Who is playing?",usr_ex:"Existing user",usr_new:"New user",taken:"This name already exists. Choose Existing user.",best:"Best",games:"Games",load:"Continue",create:"Create",exp:"Export",imp:"Import",player:"Player",stg:"Games played",stp:"Total points",stl:"Last game",stt:"Top score",sts:"solved",close:"Close",bad2:"Invalid file",scene:"Scene",sadv:["Oh no… thud!","Oops, you fell down…","Not right. Try again!"],start:"Start",pname:"Name",avatar:"Avatar",upload:"📷 Your own photo",addlang:"Add a language",lname:"Language name",add:"Add",hint:"Translate the values only, keep the keys. You can ask an AI to translate.",bad:"The translation text is not valid",title:"Island Hop",score:"Score",min:"Smallest number",max:"Largest number",ops:"Operations",wr:"Mistakes until game over",set:"Settings",save:"Play",jump:"Jump!",over:"Game over",again:"Play again",good:["Hooray! Well done!","Correct! Great!","Right! Keep going!"],sad:["Oh no… splash!","Oops, you fell in the water…","Not right. Try again!"]}
 };
 /* Scene themes: islands share one geometry (.island boxes); only the drawing inside .art changes.
    Drawings use viewBox 0 0 200 84 with the walking surface at the top. */
@@ -216,14 +223,14 @@ function submit(){
   const {d,dy,fall,V}=dx(),av=$("av");
   if(+v===cur.ans){
     av.animate([{transform:"translate(0,0)"},{transform:`translate(${d/2}px,${Math.min(0,dy)-130}px) rotate(180deg)`},{transform:`translate(${d}px,${dy}px) rotate(360deg)`}],{duration:900,easing:"ease-in-out",fill:"forwards"});
-    timers.push(setTimeout(()=>{fireworks();$("msg").textContent=S.name+"! "+pick(T[S.lang].good);score++;if(prof){prof.stats.correct++;saveProfile()}stats()},900));
+    timers.push(setTimeout(()=>{fireworks();$("msg").textContent=S.name+"! "+pick(T[S.lang].good);score++;if(prof){const st=prof.stats;st.correct++;st.totalPoints++;if(score>st.topScore)st.topScore=score;saveProfile()}stats()},900));
     timers.push(setTimeout(resetRound,3600));
   }else{
     wrong++;if(prof){prof.stats.wrong++;saveProfile()}stats();
     av.animate([{transform:"translate(0,0)",opacity:1},{transform:`translate(${d*.3}px,${Math.min(0,dy)*.5-90}px) rotate(120deg)`,opacity:1,offset:.4},{transform:`translate(${d*.5}px,${V?fall*.5:40}px) rotate(200deg)`,opacity:1,offset:.65},{transform:`translate(${d*.5}px,${V?fall:150}px) rotate(300deg)`,opacity:0}],{duration:1500,easing:"ease-in",fill:"forwards"});
     timers.push(setTimeout(()=>{$("msg").textContent="😢 "+pick(V?T[S.lang].sadv:T[S.lang].sad)},700));
     timers.push(setTimeout(()=>{
-      if(wrong>=S.maxWrong){endGame();$("final").textContent=S.name+" — "+T[S.lang].score+": "+score+" ⭐"+(prof?"  |  "+T[S.lang].best+": "+prof.stats.bestScore+"  |  "+T[S.lang].games+": "+prof.stats.gamesPlayed:"");$("over").classList.add("on");$("again").focus()}
+      if(wrong>=S.maxWrong){endGame();$("final").textContent=S.name+" — "+T[S.lang].score+": "+score+" ⭐"+(prof?"  |  "+T[S.lang].best+": "+prof.stats.topScore+"  |  "+T[S.lang].games+": "+prof.stats.gamesPlayed:"");$("over").classList.add("on");$("again").focus()}
       else resetRound();
     },2600));
   }
@@ -263,7 +270,7 @@ $("addbtn").onclick=()=>{
   S.custom[k]=c;T[k]={...T.en,...c};S.lang=k;persist();applyLang();$("err").textContent="✓ "+nm;$("lname").value="";
 };
 $("open").onclick=()=>{
-  $("cur-name").textContent="👤 "+(S.name||"—");$("umsg").textContent=prof?T[S.lang].best+": "+prof.stats.bestScore+" | "+T[S.lang].games+": "+prof.stats.gamesPlayed:"";$("s-min").value=S.min;$("s-max").value=S.max;$("s-wr").value=S.maxWrong;
+  $("cur-name").textContent="👤 "+(S.name||"—")+" ⓘ";$("umsg").textContent="";$("s-min").value=S.min;$("s-max").value=S.max;$("s-wr").value=S.maxWrong;
   document.querySelectorAll(".ops input").forEach(c=>c.checked=S.ops.includes(c.value));
   const tpl={...T.en};delete tpl.name;delete tpl.rtl;$("tpl").value=JSON.stringify(tpl,null,1);$("err").textContent="";
   $("dlg").showModal();
@@ -296,17 +303,18 @@ const cfg=()=>({min:S.min,max:S.max,ops:S.ops,maxWrong:S.maxWrong,lang:S.lang,th
 function saveProfile(){if(!prof)return;prof.avatar=snap();prof.settings=cfg();prof.updatedAt=new Date().toISOString();DB.put(prof)}
 function createProfile(n){
   const now=new Date().toISOString();
-  prof={id:"u"+Date.now().toString(36),name:n,avatar:snap(),settings:cfg(),stats:{bestScore:0,gamesPlayed:0,totalPoints:0,correct:0,wrong:0},createdAt:now,updatedAt:now};
+  prof={id:"u"+Date.now().toString(36),name:n,avatar:snap(),settings:cfg(),stats:{topScore:0,gamesPlayed:0,totalPoints:0,correct:0,wrong:0,lastGame:null},createdAt:now,updatedAt:now};
   S.name=n;persist();DB.put(prof);
 }
 function loadProfile(p){
-  p.stats=Object.assign({bestScore:0,gamesPlayed:0,totalPoints:0,correct:0,wrong:0},p.stats);
+  p.stats=Object.assign({topScore:0,gamesPlayed:0,totalPoints:0,correct:0,wrong:0,lastGame:null},p.stats);
+  if(p.stats.bestScore!==undefined){p.stats.topScore=Math.max(p.stats.topScore,p.stats.bestScore);delete p.stats.bestScore}
   prof=p;S.name=p.name;
   if(p.avatar&&p.avatar.type==="img"){S.avatar="img";S.avatarImg=p.avatar.value}
   else if(p.avatar){S.avatar=p.avatar.value;S.avatarImg=""}
   Object.assign(S,p.settings||{});persist();
 }
-function endGame(){if(prof){const s=prof.stats;s.gamesPlayed++;s.totalPoints+=score;s.bestScore=Math.max(s.bestScore,score);saveProfile()}}
+function endGame(){if(prof){const s=prof.stats;s.gamesPlayed++;s.topScore=Math.max(s.topScore,score);s.lastGame={date:new Date().toISOString(),totalSolved:score};saveProfile()}}
 function setMode(m){
   mode=m;const t=T[S.lang],ex=m==="ex";
   $("u-sel").style.display=ex?"":"none";$("nm").style.display=ex?"none":"";
@@ -338,6 +346,23 @@ $("imp").onchange=e=>{
     $("umsg").textContent=n?"✓ "+n:T[S.lang].bad2}catch(x){$("umsg").textContent=T[S.lang].bad2}};
   r.readAsText(f);e.target.value="";
 };
+function showStats(){
+  if(!prof)return;const t=T[S.lang],s=prof.stats,ap=prof.avatar||snap(),box=$("stav");
+  box.textContent="";
+  if(ap.type==="img"){const i=new Image();i.src=ap.value;i.alt="";i.style.cssText="width:72px;height:72px;border-radius:50%;object-fit:cover";box.appendChild(i)}else box.textContent=ap.value;
+  $("stname").textContent=prof.name;
+  let last="—";
+  if(s.lastGame){const loc=S.lang==="he"?"he-IL":S.lang==="ru"?"ru-RU":"en-GB";
+    last=new Date(s.lastGame.date).toLocaleString(loc,{dateStyle:"short",timeStyle:"short"})+" · "+s.lastGame.totalSolved+" "+t.sts}
+  const tb=$("sttab");tb.innerHTML="";
+  [[t.stg,s.gamesPlayed],[t.stp,s.totalPoints],[t.stl,last],[t.stt,s.topScore]].forEach(([k,v])=>{
+    const tr=document.createElement("tr"),c1=document.createElement("td"),c2=document.createElement("td");
+    c1.textContent=k;c2.textContent=v;c2.style.fontWeight="700";c2.style.textAlign="end";
+    c1.style.padding=c2.style.padding="8px 4px";tr.style.borderBottom="1px solid var(--line)";
+    tr.append(c1,c2);tb.appendChild(tr)});
+  $("stclose").textContent=t.close;$("statdlg").showModal();
+}
+$("cur-name").onclick=showStats;$("stclose").onclick=()=>$("statdlg").close();
 function renderAvatar(){
   const av=$("av");av.textContent="";
   if(S.avatar==="img"&&S.avatarImg){const i=new Image();i.src=S.avatarImg;i.alt="";av.appendChild(i);av.classList.add("pic")}
