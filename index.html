@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" dir="ltr">
+<html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -74,7 +74,9 @@ textarea{width:100%;font:12px/1.3 monospace;direction:ltr;background:var(--bg);c
     <div class="stat" id="score"></div>
     <div class="stat" id="lives" aria-live="polite"></div>
     <select id="lang" class="chip" aria-label="Language"></select>
+    <button class="chip" id="home" aria-label="menu">🏠</button>
     <button class="chip" id="open" aria-label="settings">⚙️</button>
+    <button class="chip" id="quit" aria-label="exit">🚪</button>
   </div>
 
   <div class="scene" id="scene">
@@ -99,6 +101,8 @@ textarea{width:100%;font:12px/1.3 monospace;direction:ltr;background:var(--bg);c
       <input id="nm" class="namein" type="text" maxlength="16" autocomplete="off">
       <div id="werr" style="min-height:1.2em;font-size:.95rem" aria-live="polite"></div>
       <button class="btn" id="go"></button></div>
+    <div class="over" id="menu"><h2 id="m-title"></h2><button class="btn" id="m-single" style="min-width:230px"></button><button class="btn" id="m-adv" style="min-width:230px"></button><div id="advinfo" style="opacity:.85"></div></div>
+    <div class="over" id="win" style="z-index:4;background:#0b1e2e88"><div id="win-ic" style="font-size:72px"></div><h2 id="win-t"></h2><div id="win-n" style="font-size:1.2rem"></div><button class="btn" id="cont"></button></div>
   </div>
   <div class="go"><button class="btn" id="jump"></button></div>
 </div>
@@ -111,8 +115,8 @@ textarea{width:100%;font:12px/1.3 monospace;direction:ltr;background:var(--bg);c
     <div class="hint" id="umsg" aria-live="polite"></div></div>
   <label><span id="t-scene"></span><select id="scene-sel" class="chip" style="width:auto"></select></label>
   <div style="margin:10px 0"><div id="t-avatar" style="font-weight:500;margin-bottom:6px"></div><div class="avs" id="avs"></div><button class="chip" id="upbtn" type="button" style="margin-top:8px"></button><input type="file" id="up" accept="image/*" hidden></div>
-  <label><span id="t-min"></span><input type="number" id="s-min"></label>
-  <label><span id="t-max"></span><input type="number" id="s-max"></label>
+  <label><span id="t-min"></span><input type="number" id="s-min" min="1" max="20"></label>
+  <label><span id="t-max"></span><input type="number" id="s-max" min="1" max="20"></label>
   <label><span id="t-ops"></span>
     <span class="ops">
       <label><input type="checkbox" value="+">+</label>
@@ -137,14 +141,21 @@ textarea{width:100%;font:12px/1.3 monospace;direction:ltr;background:var(--bg);c
   <div id="stav" style="font-size:56px;text-align:center"></div>
   <h3 id="stname" style="text-align:center;margin:4px 0 12px"></h3>
   <table id="sttab" style="width:100%;border-collapse:collapse"></table>
+  <div id="stgems" style="margin-top:10px"></div>
   <div class="go"><button class="btn" id="stclose" type="button"></button></div>
+</dialog>
+
+<dialog id="exitdlg">
+  <div style="font-size:72px;text-align:center">😢</div>
+  <h3 id="exq" style="text-align:center"></h3>
+  <div class="go"><button class="btn" id="exy" type="button"></button><button class="btn" id="exn" type="button" style="background:#4b86b4;box-shadow:0 4px 0 #2d5a7d"></button></div>
 </dialog>
 
 <script>
 const T={
-ru:{name:"Русский",ask:"Кто играет?",usr_ex:"Существующий пользователь",usr_new:"Новый пользователь",taken:"Такое имя уже есть. Выберите «Существующий пользователь».",best:"Рекорд",games:"Игр",load:"Продолжить",create:"Создать",exp:"Экспорт",imp:"Импорт",player:"Игрок",stg:"Сыграно игр",stp:"Всего очков",stl:"Последняя игра",stt:"Рекорд",sts:"решено",close:"Закрыть",bad2:"Неверный файл",scene:"Сцена",sadv:["Ой, не допрыгнул… Бум!","Упс, ты упал…","Неправильно. Попробуй ещё раз!"],start:"Начать",pname:"Имя",avatar:"Аватар",upload:"📷 Своё фото",addlang:"Добавить язык",lname:"Название языка",rtl:false,add:"Добавить",hint:"Переведите только значения, ключи не меняйте. Можно попросить ИИ перевести.",bad:"Ошибка в тексте перевода",title:"Прыжок на остров",score:"Очки",min:"Наименьшее число",max:"Наибольшее число",ops:"Действия",wr:"Ошибок до конца игры",set:"Настройки",save:"Играть",jump:"Прыгнуть!",over:"Игра окончена",again:"Играть снова",good:["Ура! Молодец!","Верно! Отлично!","Правильно! Так держать!"],sad:["Ой, не получилось… Булль!","Упс, ты упал в воду…","Неправильно. Попробуй ещё раз!"]},
-he:{name:"עברית",rtl:true,ask:"מי משחק?",usr_ex:"משתמש קיים",usr_new:"משתמש חדש",taken:"השם כבר קיים. בחרו משתמש קיים.",best:"שיא",games:"משחקים",load:"המשך",create:"צור",exp:"ייצוא",imp:"ייבוא",player:"שחקן",stg:"משחקים ששוחקו",stp:"סך הנקודות",stl:"משחק אחרון",stt:"שיא",sts:"נפתרו",close:"סגור",bad2:"קובץ לא תקין",scene:"תפאורה",sadv:["אוי, לא הגעת… בום!","אופס, נפלת…","לא נכון. נסו שוב!"],start:"התחל",pname:"שם",avatar:"דמות",upload:"📷 תמונה משלי",addlang:"הוספת שפה",lname:"שם השפה",add:"הוסף",hint:"תרגמו רק את הערכים, לא את המפתחות. אפשר לבקש מבינה מלאכותית לתרגם.",bad:"שגיאה בטקסט התרגום",title:"קפיצה לאי",score:"נקודות",min:"המספר הקטן ביותר",max:"המספר הגדול ביותר",ops:"פעולות",wr:"טעויות עד סוף המשחק",set:"הגדרות",save:"שחקו",jump:"קפוץ!",over:"המשחק נגמר",again:"שחקו שוב",good:["יששש! כל הכבוד!","נכון! מעולה!","תשובה נכונה! המשך כך!"],sad:["אוי, לא הצליח… בלוב!","אופס, נפלת למים…","לא נכון. נסו שוב!"]},
-en:{name:"English",rtl:false,ask:"Who is playing?",usr_ex:"Existing user",usr_new:"New user",taken:"This name already exists. Choose Existing user.",best:"Best",games:"Games",load:"Continue",create:"Create",exp:"Export",imp:"Import",player:"Player",stg:"Games played",stp:"Total points",stl:"Last game",stt:"Top score",sts:"solved",close:"Close",bad2:"Invalid file",scene:"Scene",sadv:["Oh no… thud!","Oops, you fell down…","Not right. Try again!"],start:"Start",pname:"Name",avatar:"Avatar",upload:"📷 Your own photo",addlang:"Add a language",lname:"Language name",add:"Add",hint:"Translate the values only, keep the keys. You can ask an AI to translate.",bad:"The translation text is not valid",title:"Island Hop",score:"Score",min:"Smallest number",max:"Largest number",ops:"Operations",wr:"Mistakes until game over",set:"Settings",save:"Play",jump:"Jump!",over:"Game over",again:"Play again",good:["Hooray! Well done!","Correct! Great!","Right! Keep going!"],sad:["Oh no… splash!","Oops, you fell in the water…","Not right. Try again!"]}
+ru:{name:"Русский",ask:"Кто играет?",usr_ex:"Существующий пользователь",usr_new:"Новый пользователь",taken:"Такое имя уже есть. Выберите «Существующий пользователь».",best:"Рекорд",games:"Игр",load:"Продолжить",create:"Создать",exp:"Экспорт",imp:"Импорт",player:"Игрок",stg:"Сыграно игр",stp:"Всего очков",stl:"Последняя игра",stt:"Рекорд",sts:"решено",close:"Закрыть",exq:"Ты уверен, что хочешь выйти?",exy:"Выйти",exn:"Остаться",str:"Ранг",stx:"До следующего ранга",rankup:"Новый ранг",gemnew:"Новый самоцвет",gems:"Самоцветы",bst:"Лучшая серия",single:"Одиночная игра",adv:"Приключение",stage:"Этап",winT:"Победа!",winPts:"очков",winNext:"Следующая сцена",winEnd:"Приключение пройдено!",cont:"Дальше",bad2:"Неверный файл",scene:"Сцена",sadv:["Ой, не допрыгнул… Бум!","Упс, ты упал…","Неправильно. Попробуй ещё раз!"],start:"Начать",pname:"Имя",avatar:"Аватар",upload:"📷 Своё фото",addlang:"Добавить язык",lname:"Название языка",rtl:false,add:"Добавить",hint:"Переведите только значения, ключи не меняйте. Можно попросить ИИ перевести.",bad:"Ошибка в тексте перевода",title:"Прыжок на остров",score:"Очки",min:"Наименьшее число",max:"Наибольшее число",ops:"Действия",wr:"Ошибок до конца игры",set:"Настройки",save:"Играть",jump:"Прыгнуть!",over:"Игра окончена",again:"Играть снова",good:["Ура! Молодец!","Верно! Отлично!","Правильно! Так держать!"],sad:["Ой, не получилось… Булль!","Упс, ты упал в воду…","Неправильно. Попробуй ещё раз!"]},
+he:{name:"עברית",rtl:true,ask:"מי משחק?",usr_ex:"משתמש קיים",usr_new:"משתמש חדש",taken:"השם כבר קיים. בחרו משתמש קיים.",best:"שיא",games:"משחקים",load:"המשך",create:"צור",exp:"ייצוא",imp:"ייבוא",player:"שחקן",stg:"משחקים ששוחקו",stp:"סך הנקודות",stl:"משחק אחרון",stt:"שיא",sts:"נפתרו",close:"סגור",exq:"בטוח שאתה רוצה לצאת?",exy:"יציאה",exn:"להישאר",str:"דרגה",stx:"עד הדרגה הבאה",rankup:"דרגה חדשה",gemnew:"אבן חן חדשה",gems:"אבני חן",bst:"רצף שיא",single:"משחק יחיד",adv:"הרפתקה",stage:"שלב",winT:"ניצחון!",winPts:"נקודות",winNext:"התפאורה הבאה",winEnd:"ההרפתקה הושלמה!",cont:"המשך",bad2:"קובץ לא תקין",scene:"תפאורה",sadv:["אוי, לא הגעת… בום!","אופס, נפלת…","לא נכון. נסו שוב!"],start:"התחל",pname:"שם",avatar:"דמות",upload:"📷 תמונה משלי",addlang:"הוספת שפה",lname:"שם השפה",add:"הוסף",hint:"תרגמו רק את הערכים, לא את המפתחות. אפשר לבקש מבינה מלאכותית לתרגם.",bad:"שגיאה בטקסט התרגום",title:"קפיצה לאי",score:"נקודות",min:"המספר הקטן ביותר",max:"המספר הגדול ביותר",ops:"פעולות",wr:"טעויות עד סוף המשחק",set:"הגדרות",save:"שחקו",jump:"קפוץ!",over:"המשחק נגמר",again:"שחקו שוב",good:["יששש! כל הכבוד!","נכון! מעולה!","תשובה נכונה! המשך כך!"],sad:["אוי, לא הצליח… בלוב!","אופס, נפלת למים…","לא נכון. נסו שוב!"]},
+en:{name:"English",rtl:false,ask:"Who is playing?",usr_ex:"Existing user",usr_new:"New user",taken:"This name already exists. Choose Existing user.",best:"Best",games:"Games",load:"Continue",create:"Create",exp:"Export",imp:"Import",player:"Player",stg:"Games played",stp:"Total points",stl:"Last game",stt:"Top score",sts:"solved",close:"Close",exq:"Are you sure you want to exit?",exy:"Exit",exn:"Stay",str:"Rank",stx:"To next rank",rankup:"New rank",gemnew:"New gem",gems:"Gems",bst:"Best streak",single:"Single game",adv:"Adventure",stage:"Stage",winT:"You win!",winPts:"points",winNext:"Next scene",winEnd:"Adventure complete!",cont:"Continue",bad2:"Invalid file",scene:"Scene",sadv:["Oh no… thud!","Oops, you fell down…","Not right. Try again!"],start:"Start",pname:"Name",avatar:"Avatar",upload:"📷 Your own photo",addlang:"Add a language",lname:"Language name",add:"Add",hint:"Translate the values only, keep the keys. You can ask an AI to translate.",bad:"The translation text is not valid",title:"Island Hop",score:"Score",min:"Smallest number",max:"Largest number",ops:"Operations",wr:"Mistakes until game over",set:"Settings",save:"Play",jump:"Jump!",over:"Game over",again:"Play again",good:["Hooray! Well done!","Correct! Great!","Right! Keep going!"],sad:["Oh no… splash!","Oops, you fell in the water…","Not right. Try again!"]}
 };
 /* Scene themes: islands share one geometry (.island boxes); only the drawing inside .art changes.
    Drawings use viewBox 0 0 200 84 with the walking surface at the top. */
@@ -167,11 +178,31 @@ const THEMES={
   island1:`<svg viewBox="0 0 200 22" preserveAspectRatio="none"><rect width="200" height="22" rx="4" fill="#5b4636"/><rect width="200" height="7" rx="3" fill="#a9825f"/></svg><span class="palm" style="left:6%">🪴</span>`,
   island2:`<svg viewBox="0 0 200 22" preserveAspectRatio="none"><rect width="200" height="22" rx="4" fill="#5b4636"/><rect width="200" height="7" rx="3" fill="#a9825f"/></svg><span class="palm" style="right:6%">🗄️</span>`}
 };
+/* Rating steps, by total points (= all correct answers ever). Edit names/icons/limits here. */
+const RANKS=[
+ {min:0,    icon:"🛶",name:{ru:"Юнга",he:"נער סיפון",en:"Cabin boy"}},
+ {min:100,  icon:"⛵",name:{ru:"Матрос",he:"מלח",en:"Sailor"}},
+ {min:500,  icon:"🧭",name:{ru:"Штурман",he:"נווט",en:"Navigator"}},
+ {min:1000, icon:"🚢",name:{ru:"Капитан",he:"קפטן",en:"Captain"}},
+ {min:5000, icon:"⚓",name:{ru:"Адмирал",he:"אדמירל",en:"Admiral"}},
+ {min:10000,icon:"👑",name:{ru:"Легенда морей",he:"אגדת הים",en:"Sea Legend"}}
+];
+/* Gems for outstanding performance: tiers 0..3 = emerald, ruby, sapphire, diamond */
+const GEM_ICON=["🟢","🔴","🔵","💎"];
+const AWARDS=[
+ {id:"streak",th:[10,25,50,100],name:{ru:"Без ошибок подряд",he:"ברצף ללא טעויות",en:"No-mistake streak"}},
+ {id:"games",th:[10,50,100,500],name:{ru:"Сыграно игр",he:"משחקים ששוחקו",en:"Games played"}},
+ {id:"big",th:[15,30,60,100],name:{ru:"Большая игра",he:"משחק גדול",en:"Big game"}}
+];
+const ADV=["tropical","arctic","building","space"];   /* adventure scenes, 100 points each */
+const curTheme=()=>(gmode==="adv"&&prof)?ADV[Math.min(3,Math.floor(prof.adventure.points/100))]:S.theme;
+const rankIdx=pts=>{let r=0;RANKS.forEach((x,i)=>{if(pts>=x.min)r=i});return r};
+const rname=i=>RANKS[i].name[S.lang]||RANKS[i].name.en;
 const $=id=>document.getElementById(id);
-let S={min:1,max:10,ops:["+"],maxWrong:3,lang:"ru",name:"",avatar:"🧒",avatarImg:"",theme:"tropical"};
+let S={min:1,max:10,ops:["+"],maxWrong:3,lang:"he",name:"",avatar:"🧒",avatarImg:"",theme:"tropical"};
 const AV=["🧒","👧","🦊","🐱","🐼"];
 try{Object.assign(S,JSON.parse(localStorage.getItem("islandMath")||"{}"))}catch(e){}
-S.custom=S.custom||{};for(const k in S.custom)T[k]={...T.en,...S.custom[k]};if(!T[S.lang])S.lang="ru";
+S.custom=S.custom||{};for(const k in S.custom)T[k]={...T.en,...S.custom[k]};if(!T[S.lang])S.lang="he";
 let score=0,wrong=0,busy=false,cur={a:0,b:0,op:"+",ans:0},timers=[];
 const SYM={"+":"+","-":"−","*":"×","/":"÷"};
 const rnd=(l,h)=>Math.floor(Math.random()*(h-l+1))+l;
@@ -190,7 +221,7 @@ function applyLang(){
   stats();
 }
 function stats(){
-  $("score").textContent=(S.name?"👤 "+S.name+"  ":"")+T[S.lang].score+": "+score+" ⭐";
+  $("score").textContent=(S.name?"👤 "+S.name+" "+(prof?RANKS[rankIdx(prof.stats.totalPoints)].icon:"")+"  ":"")+T[S.lang].score+": "+score+" ⭐"+(gmode==="adv"&&prof?"  🗺️ "+(prof.adventure.points%100)+"/100":"");
   let h="";for(let i=0;i<S.maxWrong;i++)h+=i<wrong?"🖤":"❤️";
   $("lives").textContent=h;
 }
@@ -223,19 +254,21 @@ function submit(){
   const {d,dy,fall,V}=dx(),av=$("av");
   if(+v===cur.ans){
     av.animate([{transform:"translate(0,0)"},{transform:`translate(${d/2}px,${Math.min(0,dy)-130}px) rotate(180deg)`},{transform:`translate(${d}px,${dy}px) rotate(360deg)`}],{duration:900,easing:"ease-in-out",fill:"forwards"});
-    timers.push(setTimeout(()=>{fireworks();$("msg").textContent=S.name+"! "+pick(T[S.lang].good);score++;if(prof){const st=prof.stats;st.correct++;st.totalPoints++;if(score>st.topScore)st.topScore=score;saveProfile()}stats()},900));
-    timers.push(setTimeout(resetRound,3600));
+    timers.push(setTimeout(()=>{fireworks();$("msg").textContent=S.name+"! "+pick(T[S.lang].good);score++;if(prof){const st=prof.stats,r0=rankIdx(st.totalPoints);st.correct++;st.totalPoints++;
+    const r1=rankIdx(st.totalPoints);if(r1>r0){$("msg").textContent=RANKS[r1].icon+" "+T[S.lang].rankup+": "+rname(r1)+"!";fireworks()}
+    if(score>st.topScore)st.topScore=score;streak++;st.bestStreak=Math.max(st.bestStreak||0,streak);checkGems("streak",streak);checkGems("big",score);if(gmode==="adv")advPoint();saveProfile()}stats()},900));
+    timers.push(setTimeout(()=>{pendingWin?showWin():resetRound()},3600));
   }else{
-    wrong++;if(prof){prof.stats.wrong++;saveProfile()}stats();
+    wrong++;streak=0;if(prof){prof.stats.wrong++;saveProfile()}stats();
     av.animate([{transform:"translate(0,0)",opacity:1},{transform:`translate(${d*.3}px,${Math.min(0,dy)*.5-90}px) rotate(120deg)`,opacity:1,offset:.4},{transform:`translate(${d*.5}px,${V?fall*.5:40}px) rotate(200deg)`,opacity:1,offset:.65},{transform:`translate(${d*.5}px,${V?fall:150}px) rotate(300deg)`,opacity:0}],{duration:1500,easing:"ease-in",fill:"forwards"});
     timers.push(setTimeout(()=>{$("msg").textContent="😢 "+pick(V?T[S.lang].sadv:T[S.lang].sad)},700));
     timers.push(setTimeout(()=>{
-      if(wrong>=S.maxWrong){endGame();$("final").textContent=S.name+" — "+T[S.lang].score+": "+score+" ⭐"+(prof?"  |  "+T[S.lang].best+": "+prof.stats.topScore+"  |  "+T[S.lang].games+": "+prof.stats.gamesPlayed:"");$("over").classList.add("on");$("again").focus()}
+      if(wrong>=S.maxWrong){endGame();$("final").textContent=S.name+" — "+T[S.lang].score+": "+score+" ⭐"+(prof?"  |  "+T[S.lang].best+": "+prof.stats.topScore+"  |  "+T[S.lang].games+": "+prof.stats.gamesPlayed:"")+(gemMsg?"   "+gemMsg:"");$("over").classList.add("on");$("again").focus()}
       else resetRound();
     },2600));
   }
 }
-function newGame(){score=0;wrong=0;$("over").classList.remove("on");resetRound()}
+function newGame(){score=0;wrong=0;streak=0;gemMsg="";if(resume){streak=parseInt(resume.streak)||0;score=parseInt(resume.score)||0;wrong=Math.min(parseInt(resume.wrong)||0,Math.max(0,S.maxWrong-1));resume=null}$("over").classList.remove("on");resetRound()}
 
 /* fireworks */
 const cv=$("fx"),cx=cv.getContext("2d");let parts=[],raf=0;
@@ -261,13 +294,13 @@ function loop(){
 $("jump").onclick=submit;
 $("ans").addEventListener("keydown",e=>{if(e.key==="Enter")submit()});
 $("again").onclick=newGame;
-$("lang").onchange=e=>{S.lang=e.target.value;persist();applyLang()};
+$("lang").onchange=e=>{S.lang=e.target.value;persist();saveProfile();applyLang()};
 $("addbtn").onclick=()=>{
   const nm=$("lname").value.trim();let d;
   try{d=JSON.parse($("tpl").value)}catch(e){}
   if(!nm||!d||typeof d!=="object"||!Array.isArray(d.good)||!Array.isArray(d.sad)){$("err").textContent=T[S.lang].bad;return}
   const k="x"+Date.now(),c={...d,name:nm,rtl:$("rtl").checked};
-  S.custom[k]=c;T[k]={...T.en,...c};S.lang=k;persist();applyLang();$("err").textContent="✓ "+nm;$("lname").value="";
+  S.custom[k]=c;T[k]={...T.en,...c};S.lang=k;persist();saveProfile();applyLang();$("err").textContent="✓ "+nm;$("lname").value="";
 };
 $("open").onclick=()=>{
   $("cur-name").textContent="👤 "+(S.name||"—")+" ⓘ";$("umsg").textContent="";$("s-min").value=S.min;$("s-max").value=S.max;$("s-wr").value=S.maxWrong;
@@ -276,11 +309,16 @@ $("open").onclick=()=>{
   $("dlg").showModal();
 };
 $("save").onclick=()=>{
-  let mn=parseInt($("s-min").value),mx=parseInt($("s-max").value),w=parseInt($("s-wr").value);
-  if(isNaN(mn))mn=1;if(isNaN(mx))mx=10;if(mn>mx)[mn,mx]=[mx,mn];
+  const cl=(v,d)=>isNaN(v)?d:Math.min(20,Math.max(1,v));
+  let mn=cl(parseInt($("s-min").value),1),mx=cl(parseInt($("s-max").value),10),w=parseInt($("s-wr").value);
+  if(mn>mx)[mn,mx]=[mx,mn];
   const ops=[...document.querySelectorAll(".ops input:checked")].map(c=>c.value);
-  S.min=mn;S.max=mx;S.ops=ops.length?ops:["+"];S.maxWrong=Math.min(20,Math.max(1,w||3));
-  persist();saveProfile();$("dlg").close();newGame();
+  const nops=ops.length?ops:["+"],nw=(isNaN(w)||w<1)?3:Math.min(w,10);
+  const changed=mn!==S.min||mx!==S.max||nw!==S.maxWrong||nops.join()!==S.ops.join();
+  S.min=mn;S.max=mx;S.ops=nops;S.maxWrong=nw;
+  persist();$("dlg").close();
+  if(changed)newGame();   /* the game restarts only when the rules changed */
+  saveProfile();
 };
 /* ---- local "REST-like" data layer: profiles stored as JSON, keyed by lower-cased name.
    Swap the bodies of DB.* for fetch() calls later to use a server. ---- */
@@ -297,24 +335,30 @@ const DB={
   put(p){const d=this.all();d[key(p.name)]=p;this.write(d)},
   names(){return Object.values(this.all()).map(p=>p.name).sort()}
 };
-let prof=null,mode="new";
+let prof=null,mode="new",resume=null,streak=0,gemMsg="",gmode="single",pendingWin=0;
 const snap=()=>S.avatar==="img"&&S.avatarImg?{type:"img",value:S.avatarImg}:{type:"emoji",value:AV.includes(S.avatar)?S.avatar:AV[0]};
 const cfg=()=>({min:S.min,max:S.max,ops:S.ops,maxWrong:S.maxWrong,lang:S.lang,theme:S.theme});
-function saveProfile(){if(!prof)return;prof.avatar=snap();prof.settings=cfg();prof.updatedAt=new Date().toISOString();DB.put(prof)}
+function saveProfile(done){if(!prof)return;prof.avatar=snap();prof.settings=cfg();prof.currentGame=(done===true||$("over").classList.contains("on"))?{score:0,wrong:0}:{score,wrong,streak,mode:gmode};prof.updatedAt=new Date().toISOString();DB.put(prof)}
 function createProfile(n){
   const now=new Date().toISOString();
-  prof={id:"u"+Date.now().toString(36),name:n,avatar:snap(),settings:cfg(),stats:{topScore:0,gamesPlayed:0,totalPoints:0,correct:0,wrong:0,lastGame:null},createdAt:now,updatedAt:now};
+  prof={id:"u"+Date.now().toString(36),name:n,avatar:snap(),settings:cfg(),stats:{topScore:0,gamesPlayed:0,totalPoints:0,correct:0,wrong:0,lastGame:null,bestStreak:0},gems:{},adventure:{points:0,wins:0},createdAt:now,updatedAt:now};
   S.name=n;persist();DB.put(prof);
 }
 function loadProfile(p){
-  p.stats=Object.assign({topScore:0,gamesPlayed:0,totalPoints:0,correct:0,wrong:0,lastGame:null},p.stats);
+  p.stats=Object.assign({topScore:0,gamesPlayed:0,totalPoints:0,correct:0,wrong:0,lastGame:null,bestStreak:0},p.stats);p.gems=p.gems||{};p.adventure=Object.assign({points:0,wins:0},p.adventure);
   if(p.stats.bestScore!==undefined){p.stats.topScore=Math.max(p.stats.topScore,p.stats.bestScore);delete p.stats.bestScore}
-  prof=p;S.name=p.name;
+  prof=p;S.name=p.name;resume=p.currentGame||null;
   if(p.avatar&&p.avatar.type==="img"){S.avatar="img";S.avatarImg=p.avatar.value}
   else if(p.avatar){S.avatar=p.avatar.value;S.avatarImg=""}
-  Object.assign(S,p.settings||{});persist();
+  Object.assign(S,p.settings||{});fixS();persist();
 }
-function endGame(){if(prof){const s=prof.stats;s.gamesPlayed++;s.topScore=Math.max(s.topScore,score);s.lastGame={date:new Date().toISOString(),totalSolved:score};saveProfile()}}
+function fixS(){
+  S.min=Math.min(20,Math.max(1,parseInt(S.min)||1));S.max=Math.min(20,Math.max(S.min,parseInt(S.max)||10));
+  S.maxWrong=(parseInt(S.maxWrong)>=1&&parseInt(S.maxWrong)<=10)?parseInt(S.maxWrong):3;
+  if(!Array.isArray(S.ops)||!S.ops.length)S.ops=["+"];
+  if(!T[S.lang])S.lang="he";if(!THEMES[S.theme])S.theme="tropical";
+}
+function endGame(){if(prof){const s=prof.stats;s.gamesPlayed++;s.topScore=Math.max(s.topScore,score);s.lastGame={date:new Date().toISOString(),totalSolved:score};checkGems("games",s.gamesPlayed);saveProfile(true)}}
 function setMode(m){
   mode=m;const t=T[S.lang],ex=m==="ex";
   $("u-sel").style.display=ex?"":"none";$("nm").style.display=ex?"none":"";
@@ -346,6 +390,15 @@ $("imp").onchange=e=>{
     $("umsg").textContent=n?"✓ "+n:T[S.lang].bad2}catch(x){$("umsg").textContent=T[S.lang].bad2}};
   r.readAsText(f);e.target.value="";
 };
+function checkGems(id,value){
+  if(!prof)return;const a=AWARDS.find(x=>x.id===id);prof.gems=prof.gems||{};let got=-1;
+  a.th.forEach((th,i)=>{const k=id+i;if(value>=th&&!prof.gems[k]){prof.gems[k]=new Date().toISOString();got=i}});
+  if(got<0)return;
+  const nm=a.name[S.lang]||a.name.en;
+  $("msg").textContent=GEM_ICON[got]+" "+T[S.lang].gemnew+": "+nm+" ("+a.th[got]+")";
+  gemMsg+=(gemMsg?"  ":"")+GEM_ICON[got]+" "+nm;
+  fireworks();
+}
 function showStats(){
   if(!prof)return;const t=T[S.lang],s=prof.stats,ap=prof.avatar||snap(),box=$("stav");
   box.textContent="";
@@ -354,22 +407,82 @@ function showStats(){
   let last="—";
   if(s.lastGame){const loc=S.lang==="he"?"he-IL":S.lang==="ru"?"ru-RU":"en-GB";
     last=new Date(s.lastGame.date).toLocaleString(loc,{dateStyle:"short",timeStyle:"short"})+" · "+s.lastGame.totalSolved+" "+t.sts}
+  const ri=rankIdx(s.totalPoints),nx=RANKS[ri+1];
+  const next=nx?nx.icon+" "+rname(ri+1)+": "+(nx.min-s.totalPoints):"🏆";
   const tb=$("sttab");tb.innerHTML="";
-  [[t.stg,s.gamesPlayed],[t.stp,s.totalPoints],[t.stl,last],[t.stt,s.topScore]].forEach(([k,v])=>{
+  [[t.str,RANKS[ri].icon+" "+rname(ri)],[t.stx,next],[t.stg,s.gamesPlayed],[t.stp,s.totalPoints],[t.stl,last],[t.stt,s.topScore],[t.bst,s.bestStreak||0]].forEach(([k,v])=>{
     const tr=document.createElement("tr"),c1=document.createElement("td"),c2=document.createElement("td");
     c1.textContent=k;c2.textContent=v;c2.style.fontWeight="700";c2.style.textAlign="end";
     c1.style.padding=c2.style.padding="8px 4px";tr.style.borderBottom="1px solid var(--line)";
     tr.append(c1,c2);tb.appendChild(tr)});
+  const gb=$("stgems");gb.innerHTML="";
+  const gh=document.createElement("div");gh.textContent=t.gems;gh.style.cssText="font-weight:700;margin:6px 0";gb.appendChild(gh);
+  AWARDS.forEach(a=>{
+    const row=document.createElement("div"),nm=document.createElement("span"),gs=document.createElement("span");
+    row.style.cssText="display:flex;justify-content:space-between;align-items:center;padding:4px 0";
+    nm.textContent=a.name[S.lang]||a.name.en;
+    a.th.forEach((th,i)=>{const e=document.createElement("span");e.textContent=GEM_ICON[i];e.title=String(th);
+      e.style.cssText="font-size:24px;margin:0 2px;"+((prof.gems&&prof.gems[a.id+i])?"":"filter:grayscale(1);opacity:.3");gs.appendChild(e)});
+    row.append(nm,gs);gb.appendChild(row)});
   $("stclose").textContent=t.close;$("statdlg").showModal();
 }
 $("cur-name").onclick=showStats;$("stclose").onclick=()=>$("statdlg").close();
+let leaving=false;
+function inProgress(){return !!prof&&!$("over").classList.contains("on")&&!$("welcome").classList.contains("on")&&(score>0||wrong>0)}
+function askExit(){
+  const t=T[S.lang];$("exq").textContent=t.exq;$("exy").textContent=t.exy;$("exn").textContent=t.exn;
+  if(!$("exitdlg").open)$("exitdlg").showModal();
+}
+function doExit(){
+  saveProfile();leaving=true;
+  if(window.appData&&appData.quit){appData.quit();return}
+  window.close();   /* works only for windows opened by a script; otherwise show a goodbye */
+  document.body.innerHTML='<p style="text-align:center;font-size:4rem;margin-top:30vh">👋</p>';
+}
+$("quit").onclick=askExit;
+$("exy").onclick=doExit;$("exn").onclick=()=>$("exitdlg").close();
+if(window.appData&&appData.onAskClose)appData.onAskClose(()=>inProgress()?askExit():doExit());
+function advPoint(){
+  const a=prof.adventure,b=Math.floor(a.points/100);a.points++;
+  const c=Math.floor(a.points/100);if(c>b)pendingWin=c;
+}
+function showMenu(){
+  if(!prof)return;
+  saveProfile();resume=prof.currentGame||null;
+  timers.forEach(clearTimeout);timers=[];busy=true;pendingWin=0;
+  ["win","over","welcome"].forEach(id=>$(id).classList.remove("on"));
+  const t=T[S.lang],a=prof.adventure;
+  $("m-title").textContent=t.title;$("m-single").textContent="🏝️ "+t.single;$("m-adv").textContent="🧭 "+t.adv;
+  $("advinfo").textContent=t.stage+" "+(Math.min(3,Math.floor(a.points/100))+1)+"/4 · "+(a.points%100)+"/100";
+  $("menu").classList.add("on");
+}
+function startMode(m){
+  gmode=m;if(resume&&(resume.mode||"single")!==m)resume=null;
+  $("menu").classList.remove("on");newGame();renderScene();
+}
+function showWin(){
+  const n=pendingWin,t=T[S.lang],fin=n>=4,nk=fin?ADV[0]:ADV[n];
+  $("msg").textContent="";
+  $("win-ic").textContent=fin?"🏆👑":"🏆";
+  $("win-t").textContent=fin?t.winEnd:t.winT+" "+(n*100)+" "+t.winPts;
+  $("win-n").textContent=t.winNext+": "+(THEMES[nk].name[S.lang]||THEMES[nk].name.en);
+  $("cont").textContent=t.cont;
+  $("win").classList.add("on");fireworks();setTimeout(fireworks,900);
+}
+$("cont").onclick=()=>{
+  const a=prof.adventure;
+  if(pendingWin>=4){a.points=0;a.wins=(a.wins||0)+1}
+  pendingWin=0;$("win").classList.remove("on");saveProfile();renderScene();resetRound();
+};
+$("m-single").onclick=()=>startMode("single");$("m-adv").onclick=()=>startMode("adv");
+$("home").onclick=showMenu;
 function renderAvatar(){
   const av=$("av");av.textContent="";
   if(S.avatar==="img"&&S.avatarImg){const i=new Image();i.src=S.avatarImg;i.alt="";av.appendChild(i);av.classList.add("pic")}
   else{av.classList.remove("pic");av.textContent=AV.includes(S.avatar)?S.avatar:AV[0]}
   const box=$("avs");box.innerHTML="";
   const add=(content,val)=>{const b=document.createElement("button");b.type="button";if(typeof content==="string")b.textContent=content;else b.appendChild(content);
-    b.setAttribute("aria-pressed",S.avatar===val);b.onclick=()=>{S.avatar=val;persist();renderAvatar()};box.appendChild(b)};
+    b.setAttribute("aria-pressed",S.avatar===val);b.onclick=()=>{S.avatar=val;persist();saveProfile();renderAvatar()};box.appendChild(b)};
   AV.forEach(e=>add(e,e));
   if(S.avatarImg){const i=new Image();i.src=S.avatarImg;i.alt="";add(i,"img")}
 }
@@ -384,15 +497,15 @@ function placeIslands(){
     else{e.bottom=e.left=e.right=""}});
 }
 function renderScene(){
-  const th=THEMES[S.theme]||THEMES.tropical,sc=$("scene");
+  const tk=curTheme(),th=THEMES[tk]||THEMES.tropical,sc=$("scene");
   sc.classList.toggle("v",th.layout==="v");
   for(const k in th.vars)sc.style.setProperty("--"+k,th.vars[k]);
   $("art1").innerHTML=th.island1;$("art2").innerHTML=th.island2;$("cloud").textContent=th.cloud;
   const sel=$("scene-sel");sel.innerHTML="";
   for(const k in THEMES){const o=document.createElement("option");o.value=k;o.textContent=THEMES[k].name[S.lang]||THEMES[k].name.en;sel.appendChild(o)}
-  sel.value=S.theme in THEMES?S.theme:"tropical";placeIslands();
+  sel.value=S.theme in THEMES?S.theme:"tropical";sel.disabled=gmode==="adv";placeIslands();
 }
-$("scene-sel").onchange=e=>{S.theme=e.target.value;persist();renderScene()};
+$("scene-sel").onchange=e=>{S.theme=e.target.value;persist();saveProfile();renderScene()};
 $("upbtn").onclick=()=>$("up").click();
 $("up").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
@@ -400,7 +513,7 @@ $("up").onchange=e=>{
   r.onload=()=>{const im=new Image();im.onload=()=>{
     const c=document.createElement("canvas");c.width=c.height=128;const s=Math.min(im.width,im.height);
     c.getContext("2d").drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,128,128);
-    S.avatarImg=c.toDataURL("image/jpeg",.85);S.avatar="img";persist();renderAvatar()};im.src=r.result};
+    S.avatarImg=c.toDataURL("image/jpeg",.85);S.avatar="img";persist();saveProfile();renderAvatar()};im.src=r.result};
   r.readAsDataURL(f);e.target.value="";
 };
 
@@ -409,16 +522,21 @@ $("go").onclick=()=>{
   else{const v=$("nm").value.trim();if(!v){$("nm").focus();return}
     if(DB.get(v)){$("werr").textContent=T[S.lang].taken;return}
     createProfile(v)}
-  $("welcome").classList.remove("on");renderAvatar();applyLang();newGame();
+  $("welcome").classList.remove("on");renderAvatar();applyLang();resetRound();showMenu();
 };
 $("nm").addEventListener("keydown",e=>{if(e.key==="Enter")$("go").click()});
 async function start(){
-  await loadFile();
+  await loadFile();fixS();
   const p=S.name&&DB.get(S.name);if(p)loadProfile(p);else if(S.name)createProfile(S.name);
-  renderAvatar();applyLang();newGame();if(!prof)showWelcome();
+  renderAvatar();applyLang();resetRound();if(!prof)showWelcome();else showMenu();
 }
 start();
-window.addEventListener("beforeunload",saveProfile);
+window.addEventListener("beforeunload",e=>{
+  saveProfile();
+  /* browsers show their own generic confirmation (custom text/pictures are not allowed here) */
+  if(!leaving&&!window.appData&&inProgress()){e.preventDefault();e.returnValue=""}
+});
+window.addEventListener("pagehide",()=>saveProfile());
 document.addEventListener("visibilitychange",()=>{if(document.hidden)saveProfile()});
 </script>
 </body>
